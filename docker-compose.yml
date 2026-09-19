@@ -1,0 +1,44 @@
+services:
+  wordpress:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_HOME: http://localhost:8080
+      WORDPRESS_SITEURL: http://localhost:8080
+      WORDPRESS_DEBUG: "true"
+      WORDPRESS_ENVIRONMENT_TYPE: local
+      WORDPRESS_FORCE_SSL_ADMIN: "false"
+      WORDPRESS_DISALLOW_FILE_MODS: "false"
+      # Local-only placeholders — real environments pull these from Key Vault.
+      WORDPRESS_AUTH_KEY: "local-dev-key-1"
+      WORDPRESS_SECURE_AUTH_KEY: "local-dev-key-2"
+      WORDPRESS_LOGGED_IN_KEY: "local-dev-key-3"
+      WORDPRESS_NONCE_KEY: "local-dev-key-4"
+      WORDPRESS_AUTH_SALT: "local-dev-salt-1"
+      WORDPRESS_SECURE_AUTH_SALT: "local-dev-salt-2"
+      WORDPRESS_LOGGED_IN_SALT: "local-dev-salt-3"
+      WORDPRESS_NONCE_SALT: "local-dev-salt-4"
+    depends_on:
+      - db
+    volumes:
+      # Stands in locally for the Azure Files share mounted in App Service.
+      - wp_uploads:/var/www/html/wp-content/uploads
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_RANDOM_ROOT_PASSWORD: "1"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  wp_uploads:
+  db_data:
